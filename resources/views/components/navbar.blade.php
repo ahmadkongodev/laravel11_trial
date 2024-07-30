@@ -21,7 +21,16 @@
 
                 <x-navbar-link href="/" :active="request()->is('/')">Home</x-navbar-link>
                 <x-navbar-link href="{{ route('posts.index') }}" :active="request()->is('posts')">Posts</x-navbar-link>
+              
+                @guest
+                <x-navbar-link href="{{ route('login') }}" :active="request()->is('login')">Login</x-navbar-link>
+                <x-navbar-link href="{{ route('register') }}" :active="request()->is('register')">Register</x-navbar-link>
+
+                @endguest
                 @auth
+                <span class="text-blue-600 dark:text-blue-400 font-semibold">
+                    {{ Auth::user()->name }}
+                </span>
                 <form action="{{route('logout')}}" method="POST">
                   @csrf
                    <x-navbar-link href="{{ route('logout') }}" 
@@ -30,11 +39,6 @@
 
                 </form>
                  @endauth
-                @guest
-                <x-navbar-link href="{{ route('login') }}" :active="request()->is('login')">Login</x-navbar-link>
-                <x-navbar-link href="{{ route('register') }}" :active="request()->is('register')">Register</x-navbar-link>
-
-                @endguest
             </ul>
         </div>
     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
 {
@@ -33,7 +34,9 @@ class PostController extends Controller
             'title'=>['required', ],
             'content'=>['required', ]
         ]);
-        Post::create($validated);
+        //$validated['user_id']=auth()->id();
+        //Post::create($validated);
+        auth()->user()->posts()->create($validated);
         return redirect()->route("posts.index")->with('message','Post created Successfully');
     }
 
@@ -51,6 +54,8 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
+        Gate::authorize('update',$post);
+
         return view("posts.edit",['post'=> $post]);
 
     }
@@ -60,12 +65,13 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
+        Gate::authorize('update',$post);
         $validated= $request->validate([
             'title'=>['required', ],
             'content'=>['required', ]
         ]);
         $post->update($validated);
-        return redirect()->route("posts.index")->with('message','Post Updated Successfully');
+        return redirect()->route("posts.show",$post->id )->with('message','Post Updated Successfully');
         
     }
 
@@ -74,6 +80,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
+        Gate::authorize('delete',$post);
+
         $post->delete();
         return redirect()->route("posts.index")->with('message','Post deleted Successfully');
 

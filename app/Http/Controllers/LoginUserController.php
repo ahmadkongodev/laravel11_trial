@@ -10,15 +10,22 @@ class LoginUserController extends Controller
     public function login()
     {
          
-        return view( "login");
+        return view("auth.login");
     }
     public function store(Request $request)
     {
-        $validated= $request->validate([
-            'title'=>['required', ],
-            'content'=>['required', ]
+         $request->validate([
+            'email'=>['required', 'email'],
+            'password'=>['required', ]
         ]);
-         return redirect()->route("posts.index")->with('message','Post created Successfully');
+        if (Auth::guard('web')->attempt(['email'=>$request->email, 'password'=> $request->password])) {
+            return redirect()->intended(route('posts.index'))->with('message','Successfully Logged In');
+        }
+        else {
+            return back()->withErrors([
+                'email'=>'The provided credential do not match our records',
+            ]);
+        }  
     }
     public function logout(Request $request)
     {
