@@ -1,24 +1,29 @@
 <x-layout>
-       @if (session('message'))
-       <div class="p-4 mb-4 mt-6 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-        <span class="font-medium">{{ session('message')}}</span> 
-      </div> 
-       @endif
+    @if (session('message'))
+        <div class="p-4 mb-4 mt-6 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
+            role="alert">
+            <span class="font-medium">{{ session('message') }}</span>
+        </div>
+    @endif
     <x-header>Posts</x-header>
 
-   @auth
-   <section>
-    <div class="flex justify-end">
-        <a href="{{ route('posts.create') }}"
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
-            Create</a>
-    </div>
-</section>
-   @endauth
+    @auth
+        <section>
+            <div class="flex justify-end">
+                <a href="{{ route('posts.create') }}"
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
+                    Create</a>
+            </div>
+        </section>
+    @endauth
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         @foreach ($posts as $post)
             <div
                 class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+
+                <a href="#">
+                    <img class="rounded-t-lg" src="{{ url('storage/' . $post->image_path) }}" alt="" />
+                </a>
                 <a href="#">
                     <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         {{ $post->title }}</h5>
@@ -36,8 +41,8 @@
             </div>
         @endforeach
         <div class="mt-6">
-                {{ $posts->links()}}
+            {{ $posts->links() }}
         </div>
-</div>
+    </div>
 
 </x-layout>

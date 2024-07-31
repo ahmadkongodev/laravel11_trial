@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 
 class PostController extends Controller
@@ -13,8 +14,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts=Post::paginate(6);
-        return view( "posts.index", ["posts"=>$posts]);
+        $posts = Post::paginate(6);
+        return view("posts.index", ["posts" => $posts]);
     }
 
     /**
@@ -30,14 +31,17 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $validated= $request->validate([
-            'title'=>['required', ],
-            'content'=>['required', ]
+        $validated = $request->validate([
+            'title' => ['required',],
+            'content' => ['required',],
+            'image_path' => ['required', 'image'],
+
         ]);
+        $validated['image_path'] = $request->file('image_path')->store('images');
         //$validated['user_id']=auth()->id();
         //Post::create($validated);
         auth()->user()->posts()->create($validated);
-        return redirect()->route("posts.index")->with('message','Post created Successfully');
+        return redirect()->route("posts.index")->with('message', 'Post created Successfully');
     }
 
     /**
@@ -45,7 +49,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        return view("posts.show",['post'=> $post]);
+        return view("posts.show", ['post' => $post]);
     }
 
     /**
@@ -54,10 +58,9 @@ class PostController extends Controller
 
     public function edit(Post $post)
     {
-        Gate::authorize('update',$post);
+        Gate::authorize('update', $post);
 
-        return view("posts.edit",['post'=> $post]);
-
+        return view("posts.edit", ['post' => $post]);
     }
 
     /**
@@ -65,14 +68,21 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        Gate::authorize('update',$post);
-        $validated= $request->validate([
-            'title'=>['required', ],
-            'content'=>['required', ]
+        Gate::authorize('update', $post);
+        $validated = $request->validate([
+            'title' => ['required',],
+            'content' => ['required',],
+            'image_path' => ['sometimes', 'image'],
+
         ]);
+        if ($request->hasFile('image_path')) {
+            File::delete(storage_path('app/public/' . $post->image_path));
+
+            $validated['image_path'] = $request->file('image_path')->store('images');
+        }
+
         $post->update($validated);
-        return redirect()->route("posts.show",$post->id )->with('message','Post Updated Successfully');
-        
+        return redirect()->route("posts.show", $post->id)->with('message', 'Post Updated Successfully');
     }
 
     /**
@@ -80,10 +90,10 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        Gate::authorize('delete',$post);
+        Gate::authorize('delete', $post);
+        File::delete(storage_path('app/public/' . $post->image_path));
 
         $post->delete();
-        return redirect()->route("posts.index")->with('message','Post deleted Successfully');
-
+        return redirect()->route("posts.index")->with('message', 'Post deleted Successfully');
     }
 }

@@ -21,7 +21,12 @@
 
                 <x-navbar-link href="/" :active="request()->is('/')">Home</x-navbar-link>
                 <x-navbar-link href="{{ route('posts.index') }}" :active="request()->is('posts')">Posts</x-navbar-link>
-              
+                
+                @if (Auth::check() && Auth::user()->is_admin)
+                <x-navbar-link href="{{ route('admin') }}" :active="request()->is('admin')">Admin</x-navbar-link>
+                    
+                @endif
+
                 @guest
                 <x-navbar-link href="{{ route('login') }}" :active="request()->is('login')">Login</x-navbar-link>
                 <x-navbar-link href="{{ route('register') }}" :active="request()->is('register')">Register</x-navbar-link>
